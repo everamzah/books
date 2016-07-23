@@ -1,0 +1,3 @@
+* Upstream books allow to save contents if title has only a space character.
+  Possibly use some string manipulation to remove any preceeding spaces, and
+  submit upstream.
