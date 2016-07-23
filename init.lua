@@ -59,7 +59,8 @@ local function on_rightclick(pos, node, clicker, itemstack, pointed_thing)
 
 		local formspec
 		if owner == player_name then
-			formspec = "size[8,8]" .. default.gui_bg ..
+			formspec = "size[8,8]" ..
+				default.gui_bg ..
 				default.gui_bg_img ..
 				"field[0.5,1;7.5,0;title;Title:;" ..
 					minetest.formspec_escape(title) .. "]" ..
@@ -67,7 +68,8 @@ local function on_rightclick(pos, node, clicker, itemstack, pointed_thing)
 					minetest.formspec_escape(text) .. "]" ..
 				"button_exit[2.5,7.5;3,1;save;Save]"
 		else
-			formspec = "size[8,8]" .. default.gui_bg ..
+			formspec = "size[8,8]" ..
+				default.gui_bg ..
 				default.gui_bg_img ..
 				"label[0.5,0.5;by " .. owner .. "]" ..
 				"tablecolumns[color;text]" ..
