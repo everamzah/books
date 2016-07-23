@@ -104,8 +104,8 @@ local function on_punch(pos, node, puncher, pointed_thing)
 		minetest.swap_node(pos, node)
 		local meta = minetest.get_meta(pos)
 		meta:set_string("infotext",
-				meta:get_string("title") .. "\n\n" ..
-				"by " .. meta:get_string("owner"))
+			meta:get_string("title") .. "\n\n" ..
+			"by " .. meta:get_string("owner"))
 	end
 end
 
@@ -123,7 +123,14 @@ local function on_dig(pos, node, digger)
 		stack = {name = "default:book"}
 	end
 	stack = ItemStack(stack)
-	print(dump(stack))
+
+	local data = {}
+	data.title = title
+	data.text = text
+	data.owner = owner
+
+	print(minetest.serialize(data))
+	stack:set_metadata(minetest.serialize(data))
 
 	local adder = digger:get_inventory():add_item("main", stack)
 	if adder then
