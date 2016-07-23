@@ -90,8 +90,8 @@ local function after_place_node(pos, placer, itemstack, pointed_thing)
 	if data then
 		local meta = minetest.get_meta(pos)
 		meta:set_string("infotext",
-				data.title .. "\n\n" ..
-				"by " .. data.owner)
+			data.title .. "\n\n" ..
+			"by " .. data.owner)
 		meta:set_string("title", data.title)
 		meta:set_string("text", data.text)
 		meta:set_string("owner", data.owner)
@@ -124,10 +124,11 @@ local function on_dig(pos, node, digger)
 	end
 	stack = ItemStack(stack)
 
-	local data = {}
-	data.title = title
-	data.text = text
-	data.owner = owner
+	local data = {
+		title = title,
+		text = text,
+		owner = owner,
+	}
 
 	print(minetest.serialize(data))
 	stack:set_metadata(minetest.serialize(data))
