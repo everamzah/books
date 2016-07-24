@@ -91,9 +91,11 @@ local function after_place_node(pos, placer, itemstack, pointed_thing)
 	local data = minetest.deserialize(itemstack:get_metadata())
 	if data then
 		local meta = minetest.get_meta(pos)
-		meta:set_string("infotext",
-			data.title .. "\n\n" ..
-			"by " .. data.owner)
+		if meta:get_string("owner") ~= "" then
+			meta:set_string("infotext",
+				data.title .. "\n\n" ..
+				"by " .. data.owner)
+		end
 		meta:set_string("title", data.title)
 		meta:set_string("text", data.text)
 		meta:set_string("owner", data.owner)
@@ -105,9 +107,12 @@ local function on_punch(pos, node, puncher, pointed_thing)
 		node.name = "default:book_closed"
 		minetest.swap_node(pos, node)
 		local meta = minetest.get_meta(pos)
-		meta:set_string("infotext",
-			meta:get_string("title") .. "\n\n" ..
-			"by " .. meta:get_string("owner"))
+		if meta:get_string("owner") ~= "" then
+			print("setting string")
+			meta:set_string("infotext",
+				meta:get_string("title") .. "\n\n" ..
+				"by " .. meta:get_string("owner"))
+		end
 	end
 end
 
