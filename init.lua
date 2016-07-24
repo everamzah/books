@@ -13,9 +13,15 @@ local function on_place(itemstack, placer, pointed_thing)
 		return itemstack
 	end
 	local meta = itemstack:get_metadata()
-	local stack = ItemStack({name = "default:book_closed"})
+	local data = minetest.deserialize(meta)
+	--print(dump(data))
 
-	stack:set_metadata(meta)
+	local stack = ItemStack({name = "default:book_closed"})
+	if data and data.owner then
+		print("Setting metadata: on_place")
+		stack:set_metadata(meta)
+	end
+
 	local _, placed = minetest.item_place(stack, placer, pointed_thing)
 	if placed then
 		itemstack:take_item()
@@ -108,7 +114,7 @@ local function on_punch(pos, node, puncher, pointed_thing)
 		minetest.swap_node(pos, node)
 		local meta = minetest.get_meta(pos)
 		if meta:get_string("owner") ~= "" then
-			print("setting string")
+			--print("setting string")
 			meta:set_string("infotext",
 				meta:get_string("title") .. "\n\n" ..
 				"by " .. meta:get_string("owner"))
@@ -119,26 +125,20 @@ end
 local function on_dig(pos, node, digger)
 	local meta = minetest.get_meta(pos)
 
-	local title = meta:get_string("title")
-	local text = meta:get_string("text")
-	local owner = meta:get_string("owner")
-
-	local stack
-	if title ~= "" then
-		stack = {name = "default:book_written"}
-	else
-		stack = {name = "default:book"}
-	end
-	stack = ItemStack(stack)
-
 	local data = {
-		title = title,
-		text = text,
-		owner = owner,
+		title = meta:get_string("title"),
+		text = meta:get_string("text"),
+		owner = meta:get_string("owner"),
 	}
 
-	print(minetest.serialize(data))
-	stack:set_metadata(minetest.serialize(data))
+	local stack
+	if data.owner ~= "" then
+		stack = ItemStack({name = "default:book_written"})
+		stack:set_metadata(minetest.serialize(data))
+	else
+		stack = ItemStack({name = "default:book"})
+	end
+	--print(minetest.serialize(data))
 
 	local adder = digger:get_inventory():add_item("main", stack)
 	if adder then
@@ -211,7 +211,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	if formname:sub(1, -10) == "default:book_" then
 		local pos = minetest.string_to_pos(formname:sub(-9))
 		local node = minetest.get_node(pos)
-		print(dump(pos), dump(node)) -- TODO: FIXME: This.
+		--print(dump(pos), dump(node)) -- TODO: FIXME: This.
 	end
 end)
 
