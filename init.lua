@@ -23,6 +23,21 @@ local function on_place(itemstack, placer, pointed_thing)
 	return itemstack
 end
 
+local function after_place_node(pos, placer, itemstack, pointed_thing)
+	local data = minetest.deserialize(itemstack:get_metadata())
+	if data then
+		local meta = minetest.get_meta(pos)
+		if meta:get_string("owner") ~= "" then
+			meta:set_string("infotext",
+				data.title .. "\n\n" ..
+				"by " .. data.owner)
+		end
+		meta:set_string("title", data.title)
+		meta:set_string("text", data.text)
+		meta:set_string("owner", data.owner)
+	end
+end
+
 local function on_rightclick(pos, node, clicker, itemstack, pointed_thing)
 	if node.name == "default:book_closed" then
 		node.name = "default:book_open"
@@ -84,21 +99,6 @@ local function on_rightclick(pos, node, clicker, itemstack, pointed_thing)
 
 		minetest.show_formspec(player_name,
 				"default:book_" .. minetest.pos_to_string(pos), formspec)
-	end
-end
-
-local function after_place_node(pos, placer, itemstack, pointed_thing)
-	local data = minetest.deserialize(itemstack:get_metadata())
-	if data then
-		local meta = minetest.get_meta(pos)
-		if meta:get_string("owner") ~= "" then
-			meta:set_string("infotext",
-				data.title .. "\n\n" ..
-				"by " .. data.owner)
-		end
-		meta:set_string("title", data.title)
-		meta:set_string("text", data.text)
-		meta:set_string("owner", data.owner)
 	end
 end
 
