@@ -120,6 +120,9 @@ local function on_dig(pos, node, digger)
 		title = meta:get_string("title"),
 		text = meta:get_string("text"),
 		owner = meta:get_string("owner"),
+		text_len = meta:get_int("text_len"),
+		page = meta:get_int("page"),
+		page_max = meta:get_int("page_max"),
 	}
 
 	local stack
@@ -211,6 +214,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		meta:set_string("text", fields.text)
 		meta:set_string("owner", player:get_player_name())
 		meta:set_string("infotext", fields.text)
+		meta:set_int("text_len", fields.text:len())
+		meta:set_int("page", 1)
+		meta:set_int("page_max", math.ceil((fields.text:gsub("[^\n]", ""):len() + 1) / lpp))
 	elseif fields.book_next or fields.book_prev then
 		-- TODO
 		print("Flipping page.")
