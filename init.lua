@@ -12,6 +12,7 @@ local function on_place(itemstack, placer, pointed_thing)
 		-- TODO: record_protection_violation()
 		return itemstack
 	end
+
 	local meta = itemstack:get_metadata()
 	local data = minetest.deserialize(meta)
 
@@ -204,10 +205,23 @@ minetest.register_node(":default:book_closed", {
 })
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
-	if formname:sub(1, -10) == "default:book_" then
-		local pos = minetest.string_to_pos(formname:sub(-9))
-		local node = minetest.get_node(pos)
-		--print(dump(pos), dump(node)) -- TODO: FIXME: This.
+	--print(formname:sub(1, 13))
+	--print(formname:sub(14))
+
+	if formname:sub(1, 13) ~= "default:book_" then
+		return
+	end
+
+	local pos = minetest.string_to_pos(formname:sub(14))
+	print("Protected:", minetest.is_protected(pos, player:get_player_name()))
+
+	local node = minetest.get_node(pos)
+	print(dump(pos), dump(node)) -- TODO: FIXME: This.
+
+	if fields.save and fields.title ~= "" and fields.text ~= "" then
+		print("hi?")
+	elseif fields.book_next or fields.book_prev then
+		print("oh, hello")
 	end
 end)
 
