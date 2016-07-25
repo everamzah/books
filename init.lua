@@ -15,7 +15,6 @@ local function on_place(itemstack, placer, pointed_thing)
 
 	local meta = itemstack:get_metadata()
 	local data = minetest.deserialize(meta)
-
 	local stack = ItemStack({name = "default:book_closed"})
 	if data and data.owner then
 		stack:set_metadata(meta)
@@ -35,10 +34,8 @@ local function after_place_node(pos, placer, itemstack, pointed_thing)
 		meta:set_string("title", data.title)
 		meta:set_string("text", data.text)
 		meta:set_string("owner", data.owner)
-		if meta:get_string("owner") ~= "" then
-			meta:set_string("infotext", data.title .. "\n\n" ..
-					"by " .. data.owner)
-		end
+		meta:set_string("infotext", data.title .. "\n\n" ..
+				"by " .. data.owner)
 	end
 end
 
