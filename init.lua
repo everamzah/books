@@ -31,15 +31,16 @@ end
 local function after_place_node(pos, placer, itemstack, pointed_thing)
 	local data = minetest.deserialize(itemstack:get_metadata())
 	if data then
+		--print("after_place_node: there be data, getting meta")
 		local meta = minetest.get_meta(pos)
-		if meta:get_string("owner") ~= "" then
-			meta:set_string("infotext",
-				data.title .. "\n\n" ..
-				"by " .. data.owner)
-		end
 		meta:set_string("title", data.title)
 		meta:set_string("text", data.text)
 		meta:set_string("owner", data.owner)
+		if meta:get_string("owner") ~= "" then
+			--print("after_place_node: there be meta:owner, setting infotext")
+			meta:set_string("infotext", data.title .. "\n\n" ..
+					"by " .. data.owner)
+		end
 	end
 end
 
@@ -219,9 +220,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	print(dump(pos), dump(node)) -- TODO: FIXME: This.
 
 	if fields.save and fields.title ~= "" and fields.text ~= "" then
-		print("hi?")
+		--print("hi?")
 	elseif fields.book_next or fields.book_prev then
-		print("oh, hello")
+		--print("oh, hello")
 	end
 end)
 
