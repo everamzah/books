@@ -219,10 +219,15 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	local node = minetest.get_node(pos)
 	print(dump(pos), dump(node)) -- TODO: FIXME: This.
 
+	local meta = minetest.get_meta(pos)
+	print("receive_fields: ", dump(meta:to_table()))
+
 	if fields.save and fields.title ~= "" and fields.text ~= "" then
-		--print("hi?")
+		print("Saving title, text to node.")
+		meta:set_string("title", fields.title)
+		meta:set_string("text", fields.text)
 	elseif fields.book_next or fields.book_prev then
-		--print("oh, hello")
+		print("Flipping page.")
 	end
 end)
 
