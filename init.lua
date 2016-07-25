@@ -108,11 +108,11 @@ local function on_punch(pos, node, puncher, pointed_thing)
 		node.name = "default:book_closed"
 		minetest.swap_node(pos, node)
 		local meta = minetest.get_meta(pos)
-		if meta:get_string("owner") ~= "" then
+		--if meta:get_string("owner") ~= "" then
 			meta:set_string("infotext",
 					meta:get_string("title") .. "\n\n" ..
 					"by " .. meta:get_string("owner"))
-		end
+		--end
 	end
 end
 
