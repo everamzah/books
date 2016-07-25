@@ -227,6 +227,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		print("Saving title, text to node.")
 		meta:set_string("title", fields.title)
 		meta:set_string("text", fields.text)
+		meta:set_string("owner", player:get_player_name())
 	elseif fields.book_next or fields.book_prev then
 		print("Flipping page.")
 	end
