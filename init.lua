@@ -14,11 +14,9 @@ local function on_place(itemstack, placer, pointed_thing)
 	end
 	local meta = itemstack:get_metadata()
 	local data = minetest.deserialize(meta)
-	--print(dump(data))
 
 	local stack = ItemStack({name = "default:book_closed"})
 	if data and data.owner then
-		print("Setting metadata: on_place")
 		stack:set_metadata(meta)
 	end
 
@@ -58,7 +56,7 @@ local function on_rightclick(pos, node, clicker, itemstack, pointed_thing)
 		local title, text, owner = "", "", player_name
 		local page, page_max, lines, string = 1, 1, {}, ""
 
-		if meta then
+		if meta:to_table().fields.owner then
 			title = meta:get_string("title")
 			text = meta:get_string("text")
 			owner = meta:get_string("owner")
@@ -114,7 +112,6 @@ local function on_punch(pos, node, puncher, pointed_thing)
 		minetest.swap_node(pos, node)
 		local meta = minetest.get_meta(pos)
 		if meta:get_string("owner") ~= "" then
-			--print("setting string")
 			meta:set_string("infotext",
 				meta:get_string("title") .. "\n\n" ..
 				"by " .. meta:get_string("owner"))
@@ -138,7 +135,6 @@ local function on_dig(pos, node, digger)
 	else
 		stack = ItemStack({name = "default:book"})
 	end
-	--print(minetest.serialize(data))
 
 	local adder = digger:get_inventory():add_item("main", stack)
 	if adder then
