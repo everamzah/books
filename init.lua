@@ -116,7 +116,6 @@ end
 
 local function on_dig(pos, node, digger)
 	local meta = minetest.get_meta(pos)
-
 	local data = {
 		title = meta:get_string("title"),
 		text = meta:get_string("text"),
