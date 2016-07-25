@@ -31,13 +31,11 @@ end
 local function after_place_node(pos, placer, itemstack, pointed_thing)
 	local data = minetest.deserialize(itemstack:get_metadata())
 	if data then
-		--print("after_place_node: there be data, getting meta")
 		local meta = minetest.get_meta(pos)
 		meta:set_string("title", data.title)
 		meta:set_string("text", data.text)
 		meta:set_string("owner", data.owner)
 		if meta:get_string("owner") ~= "" then
-			--print("after_place_node: there be meta:owner, setting infotext")
 			meta:set_string("infotext", data.title .. "\n\n" ..
 					"by " .. data.owner)
 		end
@@ -206,29 +204,20 @@ minetest.register_node(":default:book_closed", {
 })
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
-	--print(formname:sub(1, 13))
-	--print(formname:sub(14))
-
 	if formname:sub(1, 13) ~= "default:book_" then
 		return
 	end
 
-	local pos = minetest.string_to_pos(formname:sub(14))
-	print("Protected:",
-			minetest.is_protected(pos, player:get_player_name()))
-
-	local node = minetest.get_node(pos)
-	print(dump(pos), dump(node)) -- TODO: FIXME: This.
-
-	local meta = minetest.get_meta(pos)
-	print("receive_fields: ", dump(meta:to_table()))
-
 	if fields.save and fields.title ~= "" and fields.text ~= "" then
-		print("Saving title, text to node.")
+		local pos = minetest.string_to_pos(formname:sub(14))
+		local node = minetest.get_node(pos)
+		local meta = minetest.get_meta(pos)
+
 		meta:set_string("title", fields.title)
 		meta:set_string("text", fields.text)
 		meta:set_string("owner", player:get_player_name())
 	elseif fields.book_next or fields.book_prev then
+		-- TODO
 		print("Flipping page.")
 	end
 end)
