@@ -50,7 +50,7 @@ local function on_rightclick(pos, node, clicker, itemstack, pointed_thing)
 		minetest.swap_node(pos, node)
 		local meta = minetest.get_meta(pos)
 		meta:set_string("infotext",
-				meta:get_string("text"):trim(240))
+				meta:get_string("text"))
 	elseif node.name == "default:book_open" then
 		-- Courtesy of minetest_game/mods/default/craftitems.lua
 		local player_name = clicker:get_player_name()
@@ -115,8 +115,8 @@ local function on_punch(pos, node, puncher, pointed_thing)
 		local meta = minetest.get_meta(pos)
 		if meta:get_string("owner") ~= "" then
 			meta:set_string("infotext",
-				meta:get_string("title") .. "\n\n" ..
-				"by " .. meta:get_string("owner"))
+					meta:get_string("title") .. "\n\n" ..
+					"by " .. meta:get_string("owner"))
 		end
 	end
 end
@@ -214,7 +214,8 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	end
 
 	local pos = minetest.string_to_pos(formname:sub(14))
-	print("Protected:", minetest.is_protected(pos, player:get_player_name()))
+	print("Protected:",
+			minetest.is_protected(pos, player:get_player_name()))
 
 	local node = minetest.get_node(pos)
 	print(dump(pos), dump(node)) -- TODO: FIXME: This.
