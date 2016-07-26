@@ -160,12 +160,12 @@ minetest.register_node(":default:book_open", {
 	description = "Book Open (you hacker you!)",
 	inventory_image = "default_book.png",
 	tiles = {
-		"wool_white.png",	-- Top
-		"wool_brown.png",	-- Bottom
-		"wool_brown.png",	-- Right
-		"wool_brown.png",	-- Left
-		"wool_brown.png",	-- Back
-		"wool_brown.png"	-- Front
+		"books_book_open_top.png",	-- Top
+		"books_book_bottom.png",	-- Bottom
+		"books_book_open_side.png",	-- Right
+		"books_book_open_side.png",	-- Left
+		"books_book_open_front.png",	-- Back
+		"books_book_open_front.png"	-- Front
 	},
 	drawtype = "nodebox",
 	paramtype = "light",
@@ -174,8 +174,8 @@ minetest.register_node(":default:book_open", {
 	node_box = {
 		type = "fixed",
 		fixed = {
-			{-0.385, -0.465, -0.3, 0.385, -0.4, 0.3}, -- Top
-			{-0.4375, -0.5, -0.3125, 0.4375, -0.465, 0.3125},
+			{-0.375, -0.47, -0.282, 0.375, -0.4, 0.282}, -- Top
+			{-0.4375, -0.5, -0.3125, 0.4375, -0.47, 0.3125},
 		}
 	},
 	--groups = {attached_node = 1}, -- FIXME
@@ -188,12 +188,12 @@ minetest.register_node(":default:book_closed", {
 	description = "Book Closed (you hacker you!)",
 	inventory_image = "default_book.png",
 	tiles = {
-		"wool_brown.png",	-- Top
-		"wool_brown.png",	-- Bottom
-		"wool_white.png",	-- Right
-		"wool_brown.png",	-- Left
-		"wool_white.png",	-- Back
-		"wool_white.png"	-- Front
+		"books_book_bottom.png",	-- Top
+		"books_book_bottom.png",	-- Bottom
+		"books_book_open_front.png",	-- Right
+		"books_book_bottom.png",	-- Left
+		"books_book_closed_front.png^[transformFX",	-- Back
+		"books_book_closed_front.png"	-- Front
 	},
 	drawtype = "nodebox",
 	paramtype = "light",
