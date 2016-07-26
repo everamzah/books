@@ -42,6 +42,60 @@ local function after_place_node(pos, placer, itemstack, pointed_thing)
 	end
 end
 
+local function formspec_display(meta, player_name, pos)
+	-- Courtesy of minetest_game/mods/default/craftitems.lua
+	local title, text, owner = "", "", player_name
+	local page, page_max, lines, string = 1, 1, {}, ""
+
+	if meta:to_table().fields.owner then
+		title = meta:get_string("title")
+		text = meta:get_string("text")
+		owner = meta:get_string("owner")
+
+		for str in (text .. "\n"):gmatch("([^\n]*)[\n]") do
+			lines[#lines+1] = str
+		end
+
+		if meta:to_table().fields.page then
+			page = meta:to_table().fields.page
+			page_max = meta:to_table().fields.page_max
+
+			for i = ((lpp * page) - lpp) + 1, lpp * page do
+				if not lines[i] then break end
+				string = string .. lines[i] .. "\n"
+			end
+		end
+	end
+
+	local formspec
+	if owner == player_name then
+		formspec = "size[8,8]" ..
+			default.gui_bg ..
+			default.gui_bg_img ..
+			"field[0.5,1;7.5,0;title;Title:;" ..
+				minetest.formspec_escape(title) .. "]" ..
+			"textarea[0.5,1.5;7.5,7;text;Contents:;" ..
+				minetest.formspec_escape(text) .. "]" ..
+			"button_exit[2.5,7.5;3,1;save;Save]"
+	else
+		formspec = "size[8,8]" ..
+			default.gui_bg ..
+			default.gui_bg_img ..
+			"label[0.5,0.5;by " .. owner .. "]" ..
+			"tablecolumns[color;text]" ..
+			"tableoptions[background=#00000000;highlight=#00000000;border=false]" ..
+			"table[0.4,0;7,0.5;title;#FFFF00," .. minetest.formspec_escape(title) .. "]" ..
+			"textarea[0.5,1.5;7.5,7;;" ..
+				minetest.formspec_escape(string ~= "" and string or text) .. ";]" ..
+			"button[2.4,7.6;0.8,0.8;book_prev;<]" ..
+			"label[3.2,7.7;Page " .. page .. " of " .. page_max .. "]" ..
+			"button[4.9,7.6;0.8,0.8;book_next;>]"
+	end
+
+	minetest.show_formspec(player_name,
+			"default:book_" .. minetest.pos_to_string(pos), formspec)
+end
+
 local function on_rightclick(pos, node, clicker, itemstack, pointed_thing)
 	if node.name == "default:book_closed" then
 		node.name = "default:book_open"
@@ -50,62 +104,9 @@ local function on_rightclick(pos, node, clicker, itemstack, pointed_thing)
 		meta:set_string("infotext",
 				meta:get_string("text"))
 	elseif node.name == "default:book_open" then
-		-- Courtesy of minetest_game/mods/default/craftitems.lua
 		local player_name = clicker:get_player_name()
 		local meta = minetest.get_meta(pos)
-		local title, text, owner = "", "", player_name
-		local page, page_max, lines, string = 1, 1, {}, ""
-
-		if meta:to_table().fields.owner then
-			print("rightclick: meta->owner")
-			title = meta:get_string("title")
-			text = meta:get_string("text")
-			owner = meta:get_string("owner")
-
-			for str in (text .. "\n"):gmatch("([^\n]*)[\n]") do
-				lines[#lines+1] = str
-			end
-
-			if meta:to_table().fields.page then
-				print("rightclick: meta->page")
-				page = meta:to_table().fields.page
-				page_max = meta:to_table().fields.page_max
-				print(page, page, page_max)
-
-				for i = ((lpp * page) - lpp) + 1, lpp * page do
-					if not lines[i] then break end
-					string = string .. lines[i] .. "\n"
-				end
-			end
-		end
-
-		local formspec
-		if owner == player_name then
-			formspec = "size[8,8]" ..
-				default.gui_bg ..
-				default.gui_bg_img ..
-				"field[0.5,1;7.5,0;title;Title:;" ..
-					minetest.formspec_escape(title) .. "]" ..
-				"textarea[0.5,1.5;7.5,7;text;Contents:;" ..
-					minetest.formspec_escape(text) .. "]" ..
-				"button_exit[2.5,7.5;3,1;save;Save]"
-		else
-			formspec = "size[8,8]" ..
-				default.gui_bg ..
-				default.gui_bg_img ..
-				"label[0.5,0.5;by " .. owner .. "]" ..
-				"tablecolumns[color;text]" ..
-				"tableoptions[background=#00000000;highlight=#00000000;border=false]" ..
-				"table[0.4,0;7,0.5;title;#FFFF00," .. minetest.formspec_escape(title) .. "]" ..
-				"textarea[0.5,1.5;7.5,7;;" ..
-					minetest.formspec_escape(string ~= "" and string or text) .. ";]" ..
-				"button[2.4,7.6;0.8,0.8;book_prev;<]" ..
-				"label[3.2,7.7;Page " .. page .. " of " .. page_max .. "]" ..
-				"button[4.9,7.6;0.8,0.8;book_next;>]"
-		end
-
-		minetest.show_formspec(player_name,
-				"default:book_" .. minetest.pos_to_string(pos), formspec)
+		formspec_display(meta, player_name, pos)
 	end
 end
 
@@ -228,72 +229,22 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		meta:set_int("page", 1)
 		meta:set_int("page_max", math.ceil((fields.text:gsub("[^\n]", ""):len() + 1) / lpp))
 	elseif fields.book_next or fields.book_prev then
-		-- TODO
-		print("Flipping page.")
-	end
-end)
-
---[[
-minetest.register_on_player_receive_fields(function(player, formname, fields)
-	if formname ~= "default:book" then return end
-	local inv = player:get_inventory()
-	local stack = player:get_wielded_item()
-
-	if fields.save and fields.title ~= "" and fields.text ~= "" then
-		local new_stack, data
-		if stack:get_name() ~= "default:book_written" then
-			local count = stack:get_count()
-			if count == 1 then
-				stack:set_name("default:book_written")
-			else
-				stack:set_count(count - 1)
-				new_stack = ItemStack("default:book_written")
-			end
-		else
-			data = minetest.deserialize(stack:get_metadata())
-		end
-
-		if not data then data = {} end
-		data.title = fields.title
-		data.text = fields.text
-		data.text_len = #data.text
-		data.page = 1
-		data.page_max = math.ceil((#data.text:gsub("[^\n]", "") + 1) / lpp)
-		data.owner = player:get_player_name()
-		local data_str = minetest.serialize(data)
-
-		if new_stack then
-			new_stack:set_metadata(data_str)
-			if inv:room_for_item("main", new_stack) then
-				inv:add_item("main", new_stack)
-			else
-				minetest.add_item(player:getpos(), new_stack)
-			end
-		else
-			stack:set_metadata(data_str)
-		end
-
-	elseif fields.book_next or fields.book_prev then
-		local data = minetest.deserialize(stack:get_metadata())
-		if not data.page then return end
+		local pos = minetest.string_to_pos(formname:sub(14))
+		local node = minetest.get_node(pos)
+		local meta = minetest.get_meta(pos)
 
 		if fields.book_next then
-			data.page = data.page + 1
-			if data.page > data.page_max then
-				data.page = 1
+			meta:set_int("page", meta:get_int("page") + 1)
+			if meta:get_int("page") > meta:get_int("page_max") then
+				meta:set_int("page", 1)
 			end
-		else
-			data.page = data.page - 1
-			if data.page == 0 then
-				data.page = data.page_max
+		elseif fields.book_prev then
+			meta:set_int("page", meta:get_int("page") - 1)
+			if meta:get_int("page") == 0 then
+				meta:set_int("page", meta:get_int("page_max"))
 			end
 		end
 
-		local data_str = minetest.serialize(data)
-		stack:set_metadata(data_str)
-		book_on_use(stack, player)
+		formspec_display(meta, player:get_player_name(), pos)
 	end
-
-	player:set_wielded_item(stack)
 end)
---]]
