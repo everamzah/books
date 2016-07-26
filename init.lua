@@ -34,6 +34,9 @@ local function after_place_node(pos, placer, itemstack, pointed_thing)
 		meta:set_string("title", data.title)
 		meta:set_string("text", data.text)
 		meta:set_string("owner", data.owner)
+		meta:set_string("text_len", data.text_len)
+		meta:set_string("page", data.page)
+		meta:set_string("page_max", data.page_max)
 		meta:set_string("infotext", data.title .. "\n\n" ..
 				"by " .. data.owner)
 	end
@@ -54,6 +57,7 @@ local function on_rightclick(pos, node, clicker, itemstack, pointed_thing)
 		local page, page_max, lines, string = 1, 1, {}, ""
 
 		if meta:to_table().fields.owner then
+			print("rightclick: meta->owner")
 			title = meta:get_string("title")
 			text = meta:get_string("text")
 			owner = meta:get_string("owner")
@@ -62,9 +66,11 @@ local function on_rightclick(pos, node, clicker, itemstack, pointed_thing)
 				lines[#lines+1] = str
 			end
 
-			if meta.page then
-				page = meta.page
-				page_max = meta.page_max
+			if meta:to_table().fields.page then
+				print("rightclick: meta->page")
+				page = meta:to_table().fields.page
+				page_max = meta:to_table().fields.page_max
+				print(page, page, page_max)
 
 				for i = ((lpp * page) - lpp) + 1, lpp * page do
 					if not lines[i] then break end
@@ -148,6 +154,7 @@ minetest.override_item("default:book", {on_place = on_place})
 
 minetest.override_item("default:book_written", {on_place = on_place})
 
+-- TODO: for book_open, book_written_open
 minetest.register_node(":default:book_open", {
 	description = "Book Open (you hacker you!)",
 	inventory_image = "default_book.png",
@@ -175,6 +182,7 @@ minetest.register_node(":default:book_open", {
 	on_rightclick = on_rightclick,
 })
 
+-- TODO: for book_closed, book_written_closed
 minetest.register_node(":default:book_closed", {
 	description = "Book Closed (you hacker you!)",
 	inventory_image = "default_book.png",
