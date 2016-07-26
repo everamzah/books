@@ -161,7 +161,7 @@ minetest.register_node(":default:book_open", {
 	inventory_image = "default_book.png",
 	tiles = {
 		"books_book_open_top.png",	-- Top
-		"books_book_bottom.png",	-- Bottom
+		"books_book_open_bottom.png",	-- Bottom
 		"books_book_open_side.png",	-- Right
 		"books_book_open_side.png",	-- Left
 		"books_book_open_front.png",	-- Back
@@ -188,10 +188,10 @@ minetest.register_node(":default:book_closed", {
 	description = "Book Closed (you hacker you!)",
 	inventory_image = "default_book.png",
 	tiles = {
-		"books_book_bottom.png",	-- Top
-		"books_book_bottom.png",	-- Bottom
-		"books_book_open_front.png",	-- Right
-		"books_book_bottom.png",	-- Left
+		"books_book_closed_topbottom.png",	-- Top
+		"books_book_closed_topbottom.png",	-- Bottom
+		"books_book_closed_right.png",	-- Right
+		"books_book_closed_left.png",	-- Left
 		"books_book_closed_front.png^[transformFX",	-- Back
 		"books_book_closed_front.png"	-- Front
 	},
