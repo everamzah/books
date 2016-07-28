@@ -124,6 +124,11 @@ local function on_punch(pos, node, puncher, pointed_thing)
 end
 
 local function on_dig(pos, node, digger)
+	if minetest.is_protected(pos, digger:get_player_name()) then
+		-- TODO: record_protection_violation()
+		return false
+	end
+
 	local meta = minetest.get_meta(pos)
 	local data = {
 		title = meta:get_string("title"),
