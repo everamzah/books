@@ -261,6 +261,7 @@ minetest.register_privilege("editor", "Allow player to edit books with the Magic
 
 minetest.register_craftitem("books:magic_pencil", {
 	description = "Magic Pencil",
+	inventory_image = "default_stick.png", -- FIXME make a proper graphic
 	on_use = function(user, pointedthing, itemstack) -- FIXME check order
 		local pos = pointedthing.under() -- FIXME check
 		local node = minetest.getnode(pos) -- FIXME check
@@ -277,10 +278,12 @@ minetest.register_craftitem("books:magic_pencil", {
 	end,
 })
 
+-- MAKE IT EXPENSIVE
 minetest.register_craft({
 	output = "books:magic_pencil",
 	recipe = {
-		{"default:stick"}
-		{"default:mese_crystal_shard"},
+		{"group:tree"}
+		{"group:tree"}
+		{"default:mese"},
 	}
 })
