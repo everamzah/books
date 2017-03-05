@@ -42,10 +42,13 @@ local function after_place_node(pos, placer, itemstack, pointed_thing)
 	end
 end
 
-local function formspec_display(meta, player_name, pos)
+local function formspec_display(meta, player_name, pos, displayto)
 	-- Courtesy of minetest_game/mods/default/craftitems.lua
 	local title, text, owner = "", "", player_name
 	local page, page_max, lines, string = 1, 1, {}, ""
+	if not displayto then
+		displayto = player_name
+	end
 
 	if meta:to_table().fields.owner then
 		title = meta:get_string("title")
@@ -68,7 +71,7 @@ local function formspec_display(meta, player_name, pos)
 	end
 
 	local formspec
-	if owner == player_name then
+	if owner == player_name or minetest.check_player_privs(displayto, {editor = true}) then
 		formspec = "size[8,8]" ..
 			default.gui_bg ..
 			default.gui_bg_img ..
@@ -92,7 +95,7 @@ local function formspec_display(meta, player_name, pos)
 			"button[4.9,7.6;0.8,0.8;book_next;>]"
 	end
 
-	minetest.show_formspec(player_name,
+	minetest.show_formspec(displayto,
 			"default:book_" .. minetest.pos_to_string(pos), formspec)
 end
 
@@ -228,7 +231,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
 		meta:set_string("title", fields.title)
 		meta:set_string("text", fields.text)
-		meta:set_string("owner", player:get_player_name())
+		meta:set_string("owner", fields.owner or player:get_player_name() )
 		meta:set_string("infotext", fields.text)
 		meta:set_int("text_len", fields.text:len())
 		meta:set_int("page", 1)
@@ -253,3 +256,31 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		formspec_display(meta, player:get_player_name(), pos)
 	end
 end)
+
+minetest.register_privilege("editor", "Allow player to edit books with the Magic Pencil")
+
+minetest.register_craftitem("books:magic_pencil", {
+	description = "Magic Pencil",
+	on_use = function(user, pointedthing, itemstack) -- FIXME check order
+		local pos = pointedthing.under() -- FIXME check
+		local node = minetest.getnode(pos) -- FIXME check
+
+		if node.name == "default:book_open" then
+			local player_name = user:get_player_name()
+			local meta = minetest.get_meta(pos)
+			formspec_display(meta, meta:get_string("owner"), pos, player_name)
+		end
+		-- TODO add "edited by <PLAYER>" ?
+
+		itemstack:remove()
+		return itemstack
+	end,
+})
+
+minetest.register_craft({
+	output = "books:magic_pencil",
+	recipe = {
+		{"default:stick"}
+		{"default:mese_crystal_shard"},
+	}
+})
