@@ -42,13 +42,10 @@ local function after_place_node(pos, placer, itemstack, pointed_thing)
 	end
 end
 
-local function formspec_display(meta, player_name, pos, displayto)
+local function formspec_display(meta, player_name, pos)
 	-- Courtesy of minetest_game/mods/default/craftitems.lua
 	local title, text, owner = "", "", player_name
 	local page, page_max, lines, string = 1, 1, {}, ""
-	if not displayto then
-		displayto = player_name
-	end
 
 	if meta:to_table().fields.owner then
 		title = meta:get_string("title")
@@ -71,15 +68,18 @@ local function formspec_display(meta, player_name, pos, displayto)
 	end
 
 	local formspec
-	if owner == player_name or minetest.check_player_privs(displayto, {editor = true}) then
+	if owner == player_name or (minetest.check_player_privs(player_name, {editor = true}) and minetest.get_player_by_name(player_name):get_wielded_item():get_name() == "books:magic_pencil" ) then
 		formspec = "size[8,8]" ..
 			default.gui_bg ..
 			default.gui_bg_img ..
+			"field[-4,-4;0,0;owner;Owner:;" .. owner .. "]" ..
+
 			"field[0.5,1;7.5,0;title;Title:;" ..
 				minetest.formspec_escape(title) .. "]" ..
 			"textarea[0.5,1.5;7.5,7;text;Contents:;" ..
 				minetest.formspec_escape(text) .. "]" ..
 			"button_exit[2.5,7.5;3,1;save;Save]"
+			-- TODO FIXME WE NEED TO SET A HIDDEN "owner" FIELD !!
 	else
 		formspec = "size[8,8]" ..
 			default.gui_bg ..
@@ -95,7 +95,7 @@ local function formspec_display(meta, player_name, pos, displayto)
 			"button[4.9,7.6;0.8,0.8;book_next;>]"
 	end
 
-	minetest.show_formspec(displayto,
+	minetest.show_formspec(player_name,
 			"default:book_" .. minetest.pos_to_string(pos), formspec)
 end
 
@@ -261,29 +261,31 @@ minetest.register_privilege("editor", "Allow player to edit books with the Magic
 
 minetest.register_craftitem("books:magic_pencil", {
 	description = "Magic Pencil",
-	inventory_image = "default_stick.png", -- FIXME make a proper graphic
-	on_use = function(user, pointedthing, itemstack) -- FIXME check order
-		local pos = pointedthing.under() -- FIXME check
-		local node = minetest.getnode(pos) -- FIXME check
+	inventory_image = "books_magic_pencil.png",
+	--[[
+	-- FIXME - this does not work
+	on_use = function(itemstack, user, pointed_thing)
+		if not pointed_thing or not pointed_thing.under then
+			return
+		end
+
+		local node = minetest.get_node(pointed_thing.under)
 
 		if node.name == "default:book_open" then
-			local player_name = user:get_player_name()
-			local meta = minetest.get_meta(pos)
-			formspec_display(meta, meta:get_string("owner"), pos, player_name)
+			itemstack = itemstack:take_item()
 		end
-		-- TODO add "edited by <PLAYER>" ?
 
-		itemstack:remove()
 		return itemstack
 	end,
+	--]]
 })
 
 -- MAKE IT EXPENSIVE
 minetest.register_craft({
 	output = "books:magic_pencil",
 	recipe = {
-		{"group:tree"}
-		{"group:tree"}
-		{"default:mese"},
+		{"default:stick"},
+		{"default:mese_crystal_fragment"},
+		{"default:obsidian_shard"},
 	}
 })
