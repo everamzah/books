@@ -3,6 +3,19 @@
 	LGPLv2.1+
 	See LICENSE for more information ]]
 
+local debugmode = true
+
+local function tkdebug(dbstring)
+	if not debugmode then return end
+
+	minetest.debug("[33;1m"..dbstring.."[0m")
+end
+
+local function tkdump(data)
+	if not debugmode then return end
+
+	minetest.debug("[35;1m"..tostring(data).."[0m")
+end
 
 
 local lpp = 14 -- Lines per book's page
@@ -16,8 +29,13 @@ local function on_place(itemstack, placer, pointed_thing)
 	local meta = itemstack:get_metadata()
 	local data = minetest.deserialize(meta)
 	local stack = ItemStack({name = "default:book_closed"})
+	tkdebug("Transferring metadata ...")
+	--tkdump(meta)
 	if data and data.owner then
 		stack:set_metadata(meta)
+		tkdebug("Metadata copied over.")
+	else
+		tkdebug("No metadata transferred.")
 	end
 
 	local _, placed = minetest.item_place(stack, placer, pointed_thing)
@@ -29,7 +47,9 @@ end
 
 local function after_place_node(pos, placer, itemstack, pointed_thing)
 	local data = minetest.deserialize(itemstack:get_metadata())
+	tkdebug("Expect data ...")
 	if data then
+		tkdebug("writing to book node")
 		local meta = minetest.get_meta(pos)
 		meta:set_string("title", data.title)
 		meta:set_string("text", data.text)
@@ -39,6 +59,8 @@ local function after_place_node(pos, placer, itemstack, pointed_thing)
 		meta:set_string("page_max", data.page_max)
 		meta:set_string("infotext", data.title .. "\n\n" ..
 				"by " .. data.owner)
+	else
+		tkdebug("Writing nothing.")
 	end
 end
 
