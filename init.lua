@@ -3,22 +3,11 @@
 	LGPLv2.1+
 	See LICENSE for more information ]]
 
-local debugmode = true
-
-local function tkdebug(dbstring)
-	if not debugmode then return end
-
-	minetest.debug("[33;1m"..dbstring.."[0m")
-end
-
-local function tkdump(data)
-	if not debugmode then return end
-
-	minetest.debug("[35;1m"..tostring(data).."[0m")
-end
-
-
 local lpp = 14 -- Lines per book's page
+
+local function copymeta(frommeta, tometa)
+	tometa:from_table( frommeta:to_table() )
+end
 
 local function on_place(itemstack, placer, pointed_thing)
 	if minetest.is_protected(pointed_thing.above, placer:get_player_name()) then
@@ -26,16 +15,11 @@ local function on_place(itemstack, placer, pointed_thing)
 		return itemstack
 	end
 
-	local meta = itemstack:get_metadata()
-	local data = minetest.deserialize(meta)
+	local data = itemstack:get_meta()
+	local data_owner = data:get_string("owner")
 	local stack = ItemStack({name = "default:book_closed"})
-	tkdebug("Transferring metadata ...")
-	--tkdump(meta)
-	if data and data.owner then
-		stack:set_metadata(meta)
-		tkdebug("Metadata copied over.")
-	else
-		tkdebug("No metadata transferred.")
+	if data and data_owner then
+		copymeta(itemstack:get_meta(), stack:get_meta() )
 	end
 
 	local _, placed = minetest.item_place(stack, placer, pointed_thing)
@@ -46,21 +30,13 @@ local function on_place(itemstack, placer, pointed_thing)
 end
 
 local function after_place_node(pos, placer, itemstack, pointed_thing)
-	local data = minetest.deserialize(itemstack:get_metadata())
-	tkdebug("Expect data ...")
-	if data then
-		tkdebug("writing to book node")
-		local meta = minetest.get_meta(pos)
-		meta:set_string("title", data.title)
-		meta:set_string("text", data.text)
-		meta:set_string("owner", data.owner)
-		meta:set_string("text_len", data.text_len)
-		meta:set_string("page", data.page)
-		meta:set_string("page_max", data.page_max)
-		meta:set_string("infotext", data.title .. "\n\n" ..
-				"by " .. data.owner)
-	else
-		tkdebug("Writing nothing.")
+
+	local itemmeta = itemstack:get_meta()
+	if itemmeta then
+		local nodemeta = minetest.get_meta(pos)
+		copymeta(itemmeta, nodemeta)
+		nodemeta:set_string("infotext", itemmeta:get_string("title") .. "\n\n" ..
+				"by " .. itemmeta:get_string("owner"))
 	end
 end
 
@@ -154,20 +130,11 @@ local function on_dig(pos, node, digger)
 		return false
 	end
 
-	local meta = minetest.get_meta(pos)
-	local data = {
-		title = meta:get_string("title"),
-		text = meta:get_string("text"),
-		owner = meta:get_string("owner"),
-		text_len = meta:get_int("text_len"),
-		page = meta:get_int("page"),
-		page_max = meta:get_int("page_max"),
-	}
-
+	local nodemeta = minetest.get_meta(pos)
 	local stack
-	if data.owner ~= "" then
+	if nodemeta:get_string("owner") ~= "" then
 		stack = ItemStack({name = "default:book_written"})
-		stack:set_metadata(minetest.serialize(data))
+		copymeta(nodemeta, stack:get_meta() )
 	else
 		stack = ItemStack({name = "default:book"})
 	end
