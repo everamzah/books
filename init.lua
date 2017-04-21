@@ -246,35 +246,37 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	end
 end)
 
-minetest.register_privilege("editor", "Allow player to edit books with the Magic Pencil")
+if minetest.setting_getbool("books.editor") then
+	minetest.register_privilege("editor", "Allow player to edit books with the Magic Pencil")
 
-minetest.register_craftitem("books:magic_pencil", {
-	description = "Magic Pencil",
-	inventory_image = "books_magic_pencil.png",
-	--[[
-	-- FIXME - this does not work
-	on_use = function(itemstack, user, pointed_thing)
-		if not pointed_thing or not pointed_thing.under then
-			return
-		end
+	minetest.register_craftitem("books:magic_pencil", {
+		description = "Magic Pencil",
+		inventory_image = "books_magic_pencil.png",
+		--[[
+		-- FIXME - this does not work
+		on_use = function(itemstack, user, pointed_thing)
+			if not pointed_thing or not pointed_thing.under then
+				return
+			end
 
-		local node = minetest.get_node(pointed_thing.under)
+			local node = minetest.get_node(pointed_thing.under)
 
-		if node.name == "default:book_open" then
-			itemstack = itemstack:take_item()
-		end
+			if node.name == "default:book_open" then
+				itemstack = itemstack:take_item()
+			end
 
-		return itemstack
-	end,
-	--]]
-})
+			return itemstack
+		end,
+		--]]
+	})
 
--- MAKE IT EXPENSIVE
-minetest.register_craft({
-	output = "books:magic_pencil",
-	recipe = {
-		{"default:stick"},
-		{"default:mese_crystal_fragment"},
-		{"default:obsidian_shard"},
-	}
-})
+	-- MAKE IT EXPENSIVE
+	minetest.register_craft({
+		output = "books:magic_pencil",
+		recipe = {
+			{"default:stick"},
+			{"default:mese_crystal_fragment"},
+			{"default:obsidian_shard"},
+		}
+	})
+end
