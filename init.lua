@@ -68,7 +68,7 @@ local function formspec_display(meta, player_name, pos)
 	end
 
 	local formspec
-	if owner == player_name or (minetest.check_player_privs(player_name, {editor = true}) and minetest.get_player_by_name(player_name):get_wielded_item():get_name() == "books:magic_pencil" ) then
+	if owner == player_name or (minetest.check_player_privs(player_name, {editor = true}) and minetest.get_player_by_name(player_name):get_wielded_item():get_name() == "books:admin_pencil" ) then
 		formspec = "size[8,8]" ..
 			default.gui_bg ..
 			default.gui_bg_img ..
@@ -257,11 +257,11 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	end
 end)
 
-minetest.register_privilege("editor", "Allow player to edit books with the Magic Pencil")
+minetest.register_privilege("editor", "Allow player to edit books with the Admin Pencil")
 
-minetest.register_craftitem("books:magic_pencil", {
-	description = "Magic Pencil",
-	inventory_image = "books_magic_pencil.png",
+minetest.register_craftitem("books:admin_pencil", {
+	description = "Admin Pencil",
+	inventory_image = "books_admin_pencil.png",
 	--[[
 	-- FIXME - this does not work
 	on_use = function(itemstack, user, pointed_thing)
@@ -282,7 +282,7 @@ minetest.register_craftitem("books:magic_pencil", {
 
 -- MAKE IT EXPENSIVE
 minetest.register_craft({
-	output = "books:magic_pencil",
+	output = "books:admin_pencil",
 	recipe = {
 		{"default:stick"},
 		{"default:mese_crystal_fragment"},
