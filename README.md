@@ -10,6 +10,6 @@ This repository is now the official upstream, until the original author resumes 
 
 ## Versions
 
-In order to keep up pace with the official Minetest engine's features, the latest version of this mod reuqires 0.4.15-dev from February 2017 or later.
+This version requires Minetest 0.4.16 released June 2017, as the node metadata API changed in February 2017.
 
-For older versions, including the official version 0.4.15 released in December 2017, please use series 1.1.x from [past releases](https://github.com/taikedz/everamzah-books/releases), or track the v1.1.x branch instead of master
+If you are running Minetest release 0.4.15 (December 2016), please use series 1.1.x from [past releases](https://github.com/taikedz/everamzah-books/releases), or track the v1.1.x branch instead of master
