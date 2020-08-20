@@ -19,14 +19,17 @@ local function on_place(itemstack, placer, pointed_thing)
 		return itemstack
 	end
 
+	local pointed_on_rightclick = minetest.registered_nodes[minetest.get_node(pointed_thing.under).name].on_rightclick
+	if pointed_on_rightclick and not placer:get_player_control().sneak then
+		return pointed_on_rightclick(pointed_thing.under, minetest.get_node(pointed_thing.under), placer, itemstack)
+	end
 	local data = itemstack:get_meta()
 	local data_owner = data:get_string("owner")
 	local stack = ItemStack({name = "default:book_closed"})
 	if data and data_owner then
 		copymeta(itemstack:get_meta(), stack:get_meta() )
 	end
-
-	local _, placed = minetest.item_place(stack, placer, pointed_thing)
+	local _, placed = minetest.item_place_node(stack, placer, pointed_thing, nil)
 	if placed then
 		itemstack:take_item()
 	end
