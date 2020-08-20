@@ -3,6 +3,10 @@
 	LGPLv2.1+
 	See LICENSE for more information ]]
 
+-- Translation support
+local S = minetest.get_translator("books")
+local F = minetest.formspec_escape
+
 local lpp = 14 -- Lines per book's page
 
 local function copymeta(frommeta, tometa)
@@ -35,8 +39,8 @@ local function after_place_node(pos, placer, itemstack, pointed_thing)
 	if itemmeta then
 		local nodemeta = minetest.get_meta(pos)
 		copymeta(itemmeta, nodemeta)
-		nodemeta:set_string("infotext", itemmeta:get_string("title") .. "\n\n" ..
-				"by " .. itemmeta:get_string("owner"))
+		nodemeta:set_string("infotext", S("@1\n\nby @2", itemmeta:get_string("title"),
+			itemmeta:get_string("owner")))
 	end
 end
 
@@ -70,13 +74,13 @@ local function formspec_display(meta, player_name, pos)
 		formspec = "size[8,8]" ..
 			default.gui_bg ..
 			default.gui_bg_img ..
-			"field[-4,-4;0,0;owner;Owner:;" .. owner .. "]" ..
+			"field[-4,-4;0,0;owner;"..F(S("Owner:"))..";" .. owner .. "]" ..
 
-			"field[0.5,1;7.5,0;title;Title:;" ..
-				minetest.formspec_escape(title) .. "]" ..
-			"textarea[0.5,1.5;7.5,7;text;Contents:;" ..
-				minetest.formspec_escape(text) .. "]" ..
-			"button_exit[2.5,7.5;3,1;save;Save]"
+			"field[0.5,1;7.5,0;title;"..F(S("Title:"))..";" ..
+				F(title) .. "]" ..
+			"textarea[0.5,1.5;7.5,7;text;"..F(S("Contents:"))..";" ..
+				F(text) .. "]" ..
+			"button_exit[2.5,7.5;3,1;save;"..F(S("Save")).."]"
 			-- TODO FIXME WE NEED TO SET A HIDDEN "owner" FIELD !!
 	else
 		formspec = "size[8,8]" ..
@@ -85,11 +89,11 @@ local function formspec_display(meta, player_name, pos)
 			"label[0.5,0.5;by " .. owner .. "]" ..
 			"tablecolumns[color;text]" ..
 			"tableoptions[background=#00000000;highlight=#00000000;border=false]" ..
-			"table[0.4,0;7,0.5;title;#FFFF00," .. minetest.formspec_escape(title) .. "]" ..
+			"table[0.4,0;7,0.5;title;#FFFF00," .. F(title) .. "]" ..
 			"textarea[0.5,1.5;7.5,7;;" ..
-				minetest.formspec_escape(string ~= "" and string or text) .. ";]" ..
+				F(string ~= "" and string or text) .. ";]" ..
 			"button[2.4,7.6;0.8,0.8;book_prev;<]" ..
-			"label[3.2,7.7;Page " .. page .. " of " .. page_max .. "]" ..
+			"label[3.2,7.7;"..F(S("Page @1 of @2", page, page_max)) .. "]" ..
 			"button[4.9,7.6;0.8,0.8;book_next;>]"
 	end
 
@@ -118,8 +122,8 @@ local function on_punch(pos, node, puncher, pointed_thing)
 		local meta = minetest.get_meta(pos)
 		if meta:get_string("owner") ~= "" then
 			meta:set_string("infotext",
-					meta:get_string("title") .. "\n\n" ..
-					"by " .. meta:get_string("owner"))
+					S("@1\n\nby @2", meta:get_string("title"),
+					meta:get_string("owner")))
 		end
 	end
 end
@@ -154,7 +158,7 @@ minetest.override_item("default:book_written", {on_place = on_place})
 
 -- TODO: for book_open, book_written_open
 minetest.register_node(":default:book_open", {
-	description = "Book Open (you hacker you!)",
+	description = S("Book Open"),
 	inventory_image = "default_book.png",
 	tiles = {
 		"books_book_open_top.png",	-- Top
@@ -176,13 +180,14 @@ minetest.register_node(":default:book_open", {
 		}
 	},
 	--groups = {attached_node = 1}, -- FIXME
+	groups = {not_in_creative_inventory = 1},
 	on_punch = on_punch,
 	on_rightclick = on_rightclick,
 })
 
 -- TODO: for book_closed, book_written_closed
 minetest.register_node(":default:book_closed", {
-	description = "Book Closed (you hacker you!)",
+	description = S("Book Closed"),
 	inventory_image = "default_book.png",
 	tiles = {
 		"books_book_closed_topbottom.png",	-- Top
@@ -202,7 +207,7 @@ minetest.register_node(":default:book_closed", {
 			{-0.25, -0.5, -0.3125, 0.25, -0.35, 0.3125},
 		}
 	},
-	groups = {oddly_breakable_by_hand = 3, dig_immediate = 2}, --, attached_node = 1}, -- FIXME
+	groups = {oddly_breakable_by_hand = 3, dig_immediate = 2, not_in_creative_inventory = 1}, --, attached_node = 1}, -- FIXME
 	on_dig = on_dig,
 	on_rightclick = on_rightclick,
 	after_place_node = after_place_node,
@@ -246,11 +251,11 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	end
 end)
 
-if minetest.setting_getbool("books.editor") then
-	minetest.register_privilege("editor", "Allow player to edit books with the Admin Pencil")
+if minetest.settings:get_bool("books.editor", false) then
+	minetest.register_privilege("editor", S("Allow player to edit books with the Admin Pencil"))
 
 	minetest.register_craftitem("books:admin_pencil", {
-		description = "Admin Pencil",
+		description = S("Admin Pencil"),
 		inventory_image = "books_admin_pencil.png",
 		--[[
 		-- FIXME - this does not work
@@ -274,7 +279,7 @@ if minetest.setting_getbool("books.editor") then
 	minetest.register_craft({
 		output = "books:admin_pencil",
 		recipe = {
-			{"default:stick"},
+			{"group:stick"},
 			{"default:mese_crystal_fragment"},
 			{"default:obsidian_shard"},
 		}

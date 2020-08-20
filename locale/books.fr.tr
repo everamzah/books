@@ -1,0 +1,15 @@
+# textdomain: books
+
+
+### init.lua ###
+
+@1@n@nby @2=@1@n@npar @2
+Admin Pencil=Crayon d’administrateur
+Allow player to edit books with the Admin Pencil=Autorise le joueur à écrire dans les livres avec le crayon d’administrateur
+Book Closed=Livre fermé
+Book Open=Livre ouvert
+Contents:=Contenu :
+Owner:=Propriétaire :
+Page @1 of @2=Page @1 sur @2
+Save=Sauvegarder
+Title:=Titre :
