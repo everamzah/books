@@ -1,0 +1,15 @@
+# textdomain: books
+
+
+### init.lua ###
+
+@1@n@nby @2=
+Admin Pencil=
+Allow player to edit books with the Admin Pencil=
+Book Closed=
+Book Open=
+Contents:=
+Owner:=
+Page @1 of @2=
+Save=
+Title:=
