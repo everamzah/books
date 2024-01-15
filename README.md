@@ -13,3 +13,6 @@ This repository is now the official upstream, until the original author resumes 
 This version requires Minetest 0.4.16 released June 2017, as the node metadata API changed in February 2017.
 
 If you are running Minetest release 0.4.15 (December 2016), please use series 1.1.x from [past releases](https://github.com/taikedz/everamzah-books/releases), or track the v1.1.x branch instead of master; note that the 1.1.x series will no longer be updated since the release of Minetest 0.4.16.
+
+2024 - Edited by TenPlus1 for quick code tidy and to add on_blast function
+
