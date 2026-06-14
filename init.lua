@@ -280,25 +280,46 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		return
 	end
 
-	if fields.save and fields.title ~= "" and fields.text ~= "" then
+	local pos = minetest.string_to_pos(formname:sub(14))
+	local node = minetest.get_node(pos)
 
-		local pos = minetest.string_to_pos(formname:sub(14))
-		local node = minetest.get_node(pos)
-		local meta = minetest.get_meta(pos)
+	if node.name:sub(1, 13) ~= "default:book_" then
+		-- Node is not a book, therefore reject interaction.
+		return
+	end
+
+	local player_name = player:get_player_name()
+
+	if player_name == "" then
+		-- Whatever caused this call has no business in doing so, therefore reject interaction.
+		return
+	end
+
+	local meta = minetest.get_meta(pos)
+
+	if fields.save and fields.title ~= "" and fields.text ~= "" then
+		-- NOTE: There is no check for open state of the book, as another player might
+		-- have closed it while the owner is busy writing which should not result in
+		-- loss of the text.
+
+		local current_owner = meta:get_string("owner")
+
+		if current_owner == "" then
+			-- Book is unowned, the player therefore claims ownership.
+			meta:set_string("owner", fields.owner or player_name)
+		elseif current_owner ~= player_name then
+			-- The player is neither the owner of the book nor can claim it, therefore reject interaction.
+			return
+        end
 
 		meta:set_string("title", fields.title)
 		meta:set_string("text", fields.text)
-		meta:set_string("owner", fields.owner or player:get_player_name())
 		meta:set_string("infotext", fields.text)
 		meta:set_int("text_len", fields.text:len())
 		meta:set_int("page", 1)
 		meta:set_int("page_max", math.ceil((fields.text:gsub("[^\n]", ""):len() + 1) / lpp))
 
 	elseif fields.book_next or fields.book_prev then
-
-		local pos = minetest.string_to_pos(formname:sub(14))
-		local node = minetest.get_node(pos)
-		local meta = minetest.get_meta(pos)
 
 		if fields.book_next then
 
@@ -317,7 +338,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			end
 		end
 
-		formspec_display(meta, player:get_player_name(), pos)
+		formspec_display(meta, player_name, pos)
 	end
 end)
 
@@ -356,4 +377,3 @@ if minetest.settings:get_bool("books.editor", false) then
 		}
 	})
 end
-
